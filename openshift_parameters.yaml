@@ -1,0 +1,76 @@
+# Invoke:
+# heat stack-create ocp3-heat \
+#      -e openshift_parameters.yaml \
+#      -e /usr/share/openshift-heat-templates/env_loadbalancer_dedicated.yaml \
+#      -t /usr/share/openshift-heat-templates/openshift.yaml
+#
+parameters:
+  # OpenShift service characteristics
+  deployment_type: openshift-test-cluster
+  domain_name: "ocp3.example.com"
+  app_subdomain: "apps.ocp3.example.com"
+  lb_hostname: "devs"
+  loadbalancer_type: dedicated
+  openshift_sdn: flannel
+  deploy_router: true
+  deploy_registry: true
+
+  # Number of each server type
+  master_count: 3
+  infra_count: 3
+  node_count: 2
+
+  # OpenStack network characteristics
+  external_network: provider1
+  internal_subnet: "172.22.10.0/24"
+  container_subnet: "172.22.20.0/24"
+
+  # DNS resolver and updates
+  dns_nameserver: 10.122.128.218
+  # ??
+  # dns_update_key: <HMAC:MD5 string>
+
+  # Instance access
+  ssh_key_name: Test11
+  ssh_user: admin
+
+  # Image selection
+  bastion_image: RHEL7
+  master_image: RHEL7
+  infra_image: RHEL7
+  node_image: RHEL7
+  loadbalancer_image: RHEL7
+
+  # Docker Storage controls
+  master_docker_volume_size_gb: 10
+  infra_docker_volume_size_gb: 20
+  node_docker_volume_size_gb: 100
+
+  # OpenStack user credentials
+  os_auth_url: http://10.122.137.202:5000/v2.0
+  os_username: admin
+  os_password: adm1n
+  os_region_name: RegionOne
+  os_tenant_name: admin
+
+  # Red Hat Subscription information
+  rhn_username: "janis.rancans@accenture.com"
+  rhn_password: "r@9813106d"
+  # rhn_pool: '<pool id containing openshift>'
+
+parameter_defaults:
+  # Authentication service information
+  ldap_url: "ldap://ad.example.com.com:389/cn=users,dc=example,dc=com?sAMAccountName"
+  ldap_preferred_username: "sAMAccountName"
+  ldap_bind_dn: "cn=openshift,cn=users,dc=example,dc=com"
+  ldap_bind_password: "password"
+  ldap_insecure: true
+
+resource_registry:
+  # Adjust path for each entry
+  OOShift::LoadBalancer: /usr/share/openshift-heat-templates/loadbalancer_dedicated.yaml
+  OOShift::ContainerPort: /usr/share/openshift-heat-templates/sdn_flannel.yaml
+  OOShift::IPFailover: /usr/share/openshift-heat-templates/ipfailover_keepalived.yaml
+  OOShift::DockerVolume: /usr/share/openshift-heat-templates/volume_docker.yaml
+  OOShift::DockerVolumeAttachment: /usr/share/openshift-heat-templates/volume_attachment_docker.yaml
+  OOShift::RegistryVolume: /usr/share/openshift-heat-templates/registry_ephemeral.yaml
